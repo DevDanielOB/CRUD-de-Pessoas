@@ -25,6 +25,15 @@ async function bootstrap() {
     .setTitle('CRUD de Pessoas API')
     .setDescription('API para gerenciamento de pessoas')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Informe o token JWT no formato: Bearer <token>',
+      },
+      'JWT-auth',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

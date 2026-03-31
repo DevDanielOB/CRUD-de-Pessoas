@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { PeopleService } from './people.service';
 import { CreatePersonDto } from './dtos/create-person.dto';
 import { UpdatePersonDto } from './dtos/update-person.dto';
 import { GetPeopleQueryDto } from './dtos/get-people-query.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('people')
+@ApiBearerAuth('JWT-auth')
 @Controller('people')
+@UseGuards(JwtAuthGuard)
 export class PeopleController {
   constructor(private readonly peopleService: PeopleService) {}
 

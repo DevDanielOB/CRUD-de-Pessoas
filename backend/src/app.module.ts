@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './common/prisma.module';
 import { PeopleModule } from './modules/people/people.module';
 import { HealthModule } from './modules/health/health.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { HealthModule } from './modules/health/health.module';
       isGlobal: true,
     }),
     PrismaModule,
+    AuthModule,
     PeopleModule,
     HealthModule,
   ],
