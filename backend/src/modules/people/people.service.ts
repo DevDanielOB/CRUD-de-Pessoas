@@ -1,5 +1,5 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { Person } from '@prisma/client';
+import { Person, Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 import { CreatePersonDto } from './dtos/create-person.dto';
 import { UpdatePersonDto } from './dtos/update-person.dto';
@@ -10,7 +10,8 @@ export class PeopleService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createPersonDto: CreatePersonDto) {
-    const { birthDate, ...data } = createPersonDto;
+    const { birthDate, email, cpf, ...rest } = createPersonDto;
+    await this.ensureUniqueFields({ email, cpf });
 
     // Validar birthDate não futura
     const birth = new Date(birthDate);
@@ -21,7 +22,9 @@ export class PeopleService {
     try {
       return await this.prisma.person.create({
         data: {
-          ...data,
+          ...rest,
+          email,
+          cpf,
           birthDate: birth,
         },
       });
@@ -38,7 +41,7 @@ export class PeopleService {
     const { page = 1, limit = 10, fullName, email, cpf } = query;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.PersonWhereInput = {};
     if (fullName) where.fullName = { contains: fullName, mode: 'insensitive' };
     if (email) where.email = { contains: email, mode: 'insensitive' };
     if (cpf) where.cpf = { contains: cpf };
@@ -77,6 +80,23 @@ export class PeopleService {
   async update(id: string, updatePersonDto: UpdatePersonDto) {
     const { birthDate, ...rest } = updatePersonDto;
     const data: Partial<Person> = rest;
+    const personId = Number(id);
+    const existingPerson = await this.prisma.person.findUnique({
+      where: { id: personId },
+    });
+    if (!existingPerson) {
+      throw new NotFoundException('Pessoa não encontrada');
+    }
+
+    if (updatePersonDto.email || updatePersonDto.cpf) {
+      await this.ensureUniqueFields(
+        {
+          email: updatePersonDto.email,
+          cpf: updatePersonDto.cpf,
+        },
+        personId,
+      );
+    }
 
     if (birthDate) {
       const birth = new Date(birthDate);
@@ -88,7 +108,7 @@ export class PeopleService {
 
     try {
       return await this.prisma.person.update({
-        where: { id: Number(id) },
+        where: { id: personId },
         data,
       });
     } catch (error) {
@@ -113,6 +133,37 @@ export class PeopleService {
         throw new NotFoundException('Pessoa não encontrada');
       }
       throw error;
+    }
+  }
+
+  private async ensureUniqueFields(data: { email?: string; cpf?: string }, ignoreId?: number) {
+    const orConditions: Prisma.PersonWhereInput[] = [];
+
+    if (data.email) {
+      orConditions.push({ email: { equals: data.email, mode: 'insensitive' } });
+    }
+
+    if (data.cpf) {
+      orConditions.push({ cpf: data.cpf });
+    }
+
+    if (!orConditions.length) return;
+
+    const existing = await this.prisma.person.findFirst({
+      where: {
+        OR: orConditions,
+        ...(ignoreId ? { NOT: { id: ignoreId } } : {}),
+      },
+    });
+
+    if (!existing) return;
+
+    if (data.email && existing.email.toLowerCase() === data.email.toLowerCase()) {
+      throw new ConflictException('email já cadastrado');
+    }
+
+    if (data.cpf && existing.cpf === data.cpf) {
+      throw new ConflictException('cpf já cadastrado');
     }
   }
 }

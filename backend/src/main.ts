@@ -6,6 +6,13 @@ import { AllExceptionsFilter } from './common/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+
+  app.enableCors({
+    origin: corsOrigin,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
@@ -38,10 +45,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   await app.listen(process.env.PORT ?? 3000);
-
-  console.log(process.env.DATABASE_URL);
-
-  console.log(`Aplicação rodando em: http://localhost:${process.env.PORT ?? 3000}`);
   console.log(`Documentação Swagger disponível em: http://localhost:${process.env.PORT ?? 3000}/api`);
 }
 bootstrap();
