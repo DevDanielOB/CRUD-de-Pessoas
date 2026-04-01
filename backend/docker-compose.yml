@@ -1,19 +1,15 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
     container_name: crud-pessoas-postgres
-    environment:
-      POSTGRES_DB: crud_pessoas
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    env_file:
+      - ../.env
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,11 +19,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: crud-pessoas-app
+    env_file:
+      - ../.env
     ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/crud_pessoas?schema=public"
-      NODE_ENV: production
+      - '3000:3000'
     depends_on:
       postgres:
         condition: service_healthy

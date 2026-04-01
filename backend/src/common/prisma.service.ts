@@ -4,8 +4,9 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
     constructor() {
+        const nodeEnv = process.env.BACKEND_NODE_ENV ?? process.env.NODE_ENV;
         super({
-            log: process.env.NODE_ENV === 'development'
+            log: nodeEnv === 'development'
                 ? ['query', 'info', 'warn', 'error']
                 : ['error'],
         });
