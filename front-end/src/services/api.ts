@@ -1,4 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const TOKEN_STORAGE_KEY = 'crud-pessoas.jwt-token';
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -13,7 +14,24 @@ interface AuthTokenResponse {
   type: string;
 }
 
-let jwtToken = '';
+let jwtToken = readStoredToken();
+
+function readStoredToken(): string {
+  if (typeof window === 'undefined') return '';
+  return window.sessionStorage.getItem(TOKEN_STORAGE_KEY) ?? '';
+}
+
+function persistToken(token: string): void {
+  jwtToken = token;
+  if (typeof window === 'undefined') return;
+
+  if (token) {
+    window.sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
+    return;
+  }
+
+  window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+}
 
 function getHeaders(withAuth: boolean): HeadersInit {
   const headers: Record<string, string> = {
@@ -37,7 +55,7 @@ async function ensureToken(): Promise<void> {
   }
 
   const result = (await response.json()) as AuthTokenResponse;
-  jwtToken = result.token;
+  persistToken(result.token);
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -53,7 +71,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   });
 
   if (auth && response.status === 401) {
-    jwtToken = '';
+    persistToken('');
     await ensureToken();
     response = await fetch(`${API_URL}${path}`, {
       method,

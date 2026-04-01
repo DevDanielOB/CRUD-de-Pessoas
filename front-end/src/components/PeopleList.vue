@@ -8,6 +8,7 @@ const props = defineProps<{
   loading: boolean;
   error: string;
   searchTerm: string;
+  loadingMessage?: string;
 }>();
 
 defineEmits<{
@@ -24,7 +25,10 @@ const isEmpty = computed(() => !props.loading && !props.error && props.people.le
   <div>
     <div v-if="loading" class="rounded-xl border border-[#27272a] bg-[#18181b] p-10 text-center text-[#a1a1aa]">
       <div class="mx-auto mb-3 spinner" />
-      Carregando pessoas...
+      <p>{{ loadingMessage ?? 'Carregando pessoas...' }}</p>
+      <p v-if="loadingMessage" class="mt-2 text-sm text-[#71717a]">
+        A primeira resposta pode demorar enquanto a instância gratuita do Render é reativada.
+      </p>
     </div>
 
     <div v-else-if="error" class="rounded-xl border border-[#7f1d1d] bg-[#271314] p-8 text-center">

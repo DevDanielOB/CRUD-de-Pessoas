@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = Number(process.env.PORT ?? 3000);
   const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
-  const swaggerEnabled = process.env.SWAGGER_ENABLED !== 'false';
+  const nodeEnv = process.env.BACKEND_NODE_ENV ?? process.env.NODE_ENV ?? 'development';
+  const swaggerEnabled = process.env.SWAGGER_ENABLED
+    ? process.env.SWAGGER_ENABLED !== 'false'
+    : nodeEnv !== 'production';
   const appUrl = (process.env.APP_URL ?? `http://localhost:${port}`).replace(/\/$/, '');
   const swaggerPath = 'api';
   const swaggerUrl = `${appUrl}/${swaggerPath}`;

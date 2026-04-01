@@ -8,6 +8,7 @@ import type { Person, PersonPayload } from './types/person';
 
 const people = ref<Person[]>([]);
 const loading = ref(false);
+const loadingMessage = ref('Carregando pessoas...');
 const error = ref('');
 const search = ref('');
 const isModalOpen = ref(false);
@@ -39,11 +40,19 @@ function showToast(message: string, type: 'success' | 'error'): void {
 async function fetchPeople(searchValue = search.value): Promise<void> {
   loading.value = true;
   error.value = '';
+  loadingMessage.value = 'Carregando pessoas...';
+  const wakeUpHintTimeout = window.setTimeout(() => {
+    if (loading.value) {
+      loadingMessage.value = 'Acordando a API no Render...';
+    }
+  }, 1500);
+
   try {
     people.value = await listPeople(searchValue);
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Erro ao carregar pessoas';
   } finally {
+    window.clearTimeout(wakeUpHintTimeout);
     loading.value = false;
   }
 }
@@ -159,6 +168,7 @@ onMounted(async () => {
       <PeopleList
         :people="people"
         :loading="loading"
+        :loading-message="loadingMessage"
         :error="error"
         :search-term="search"
         @edit="openEditModal"
