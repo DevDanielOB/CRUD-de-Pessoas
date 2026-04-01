@@ -1,0 +1,34 @@
+# Node / build
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/.cache/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+!**/.env.example
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Front-end specific
+front-end/node_modules/
+front-end/dist/
+
+# Backend generated
+backend/generated/prisma/
