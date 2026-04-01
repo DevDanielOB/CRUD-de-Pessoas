@@ -4,6 +4,7 @@ import { PrismaModule } from './common/prisma.module';
 import { PeopleModule } from './modules/people/people.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { TelemetryModule } from './common/telemetry.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     PrismaModule,
     AuthModule,
+    TelemetryModule,
     PeopleModule,
     HealthModule,
   ],

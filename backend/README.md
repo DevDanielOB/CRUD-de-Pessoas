@@ -120,12 +120,27 @@ A aplicação estará disponível em `http://localhost:3000`
 
 ## Documentação da API
 
-A documentação Swagger está disponível em `http://localhost:3000/api`
+Em ambiente local, a documentação Swagger fica disponível em `http://localhost:3000/api`.
+
+Em outros ambientes, a URL pública deve ser configurada com a variável `APP_URL`. Exemplo:
+
+```env
+APP_URL=https://api.seudominio.com
+```
+
+Com isso, o backend passa a anunciar o Swagger em `https://api.seudominio.com/api`.
+
+Se quiser desabilitar o Swagger em produção:
+
+```env
+SWAGGER_ENABLED=false
+```
 
 ## Endpoints
 
 ### Health Check
 - `GET /health` - Verificar saúde da aplicação
+- `GET /health/metrics` - Acompanhar métricas simples da aplicação (requer JWT)
 
 ### Pessoas
 - `POST /people` - Criar pessoa
@@ -161,6 +176,7 @@ npm run test
 
 - ValidationPipe global com whitelist e forbidNonWhitelisted
 - Tratamento padronizado de erros com AllExceptionsFilter
+- Telemetria simples em memória com contagem de requests, erros, latência média e últimas falhas
 - Paginação na listagem com page e limit
 - Busca opcional por fullName, email ou cpf (case insensitive)
 - Validador customizado para CPF

@@ -6,7 +6,12 @@ import { AllExceptionsFilter } from './common/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const port = Number(process.env.PORT ?? 3000);
   const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+  const swaggerEnabled = process.env.SWAGGER_ENABLED !== 'false';
+  const appUrl = (process.env.APP_URL ?? `http://localhost:${port}`).replace(/\/$/, '');
+  const swaggerPath = 'api';
+  const swaggerUrl = `${appUrl}/${swaggerPath}`;
 
   app.enableCors({
     origin: corsOrigin,
@@ -32,6 +37,7 @@ async function bootstrap() {
     .setTitle('CRUD de Pessoas API')
     .setDescription('API para gerenciamento de pessoas')
     .setVersion('1.0')
+    .addServer(appUrl)
     .addBearerAuth(
       {
         type: 'http',
@@ -42,9 +48,19 @@ async function bootstrap() {
       'JWT-auth',
     )
     .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Documentação Swagger disponível em: http://localhost:${process.env.PORT ?? 3000}/api`);
+
+  if (swaggerEnabled) {
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(swaggerPath, app, document);
+  }
+
+  await app.listen(port);
+
+  if (swaggerEnabled) {
+    console.log(`Documentação Swagger disponível em: ${swaggerUrl}`);
+    return;
+  }
+
+  console.log('Swagger desabilitado para este ambiente.');
 }
 bootstrap();
