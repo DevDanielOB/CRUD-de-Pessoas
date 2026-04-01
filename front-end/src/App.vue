@@ -141,22 +141,18 @@ onMounted(async () => {
         </button>
       </div>
 
-      <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div class="rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
+      <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="flex min-h-[104px] flex-col items-center justify-center rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
           <p class="mb-1 text-xs font-medium text-[#71717a]">Total de Pessoas</p>
           <p class="text-2xl font-bold">{{ stats.total }}</p>
         </div>
-        <div class="rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
+        <div class="flex min-h-[104px] flex-col items-center justify-center rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
           <p class="mb-1 text-xs font-medium text-[#71717a]">Cadastros Hoje</p>
           <p class="text-2xl font-bold text-[#6366f1]">{{ stats.today }}</p>
         </div>
-        <div class="rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
+        <div class="flex min-h-[104px] flex-col items-center justify-center rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
           <p class="mb-1 text-xs font-medium text-[#71717a]">Resultados</p>
           <p class="text-2xl font-bold">{{ stats.filtered }}</p>
-        </div>
-        <div class="rounded-xl border border-[#27272a] bg-[#1e1e2e] p-4 text-center">
-          <p class="mb-1 text-xs font-medium text-[#71717a]">Espaço</p>
-          <p class="text-2xl font-bold text-[#a78bfa]">{{ stats.usage }}</p>
         </div>
       </div>
 
