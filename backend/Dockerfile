@@ -1,20 +1,21 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Copiar todos os arquivos necessários
-COPY . .
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
-# Instalar dependências
+COPY package*.json ./
+COPY prisma ./prisma
+
 RUN npm ci
-
-# Gerar cliente Prisma
 RUN npx prisma generate
 
-# Build
+COPY . .
+
 RUN npm run build
 
 EXPOSE 3000
 
-# Command para rodar migrations e iniciar
 CMD ["sh", "-c", "npx prisma db push && npm run start:prod"]
